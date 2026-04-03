@@ -431,6 +431,50 @@ function App() {
 
       <main style={{ maxWidth: 900, margin: "0 auto", padding: "32px 24px 60px" }}>
 
+        {/* Základní instrukce */}
+        <div style={{
+          background: CARD_BG, borderRadius: 12, marginBottom: 28,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)", overflow: "hidden",
+        }}>
+          <div style={{ background: PLP_BLUE, padding: "12px 24px" }}>
+            <h2 style={{ color: "#fff", fontSize: 16, fontWeight: 700, margin: 0 }}>
+              Základní instrukce
+            </h2>
+          </div>
+          <div style={{ padding: "20px 24px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 18, lineHeight: 1.4 }}>🏡</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: DARK_GRAY }}>Co se seká: </span>
+                  <span style={{ color: DARK_GRAY }}>Prostor kolem kostela (1 sekáč), zahrada a hřiště (2 sekáči, kteří se mezi sebou dohodnou, kdo co a kdy udělá).</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 18, lineHeight: 1.4 }}>📅</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: DARK_GRAY }}>Termín: </span>
+                  <span style={{ color: DARK_GRAY }}>Vždy v sobotu ± 4 dny. Rozpis je sestavený tak, aby byl pro každého rovnoměrně rozložený.</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 18, lineHeight: 1.4 }}>🌱</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: DARK_GRAY }}>Pokud tráva není na sekání: </span>
+                  <span style={{ color: DARK_GRAY }}>Nesečte a dejte vědět.</span>
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <span style={{ fontSize: 18, lineHeight: 1.4 }}>🔒</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: DARK_GRAY }}>Kód do kůlny s nářadím: </span>
+                  <span style={{ color: DARK_GRAY, fontWeight: 700, fontSize: 16 }}>7560</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Legenda */}
         <div style={{ display: "flex", gap: 12, marginBottom: 24, flexWrap: "wrap" }}>
           <div style={{
