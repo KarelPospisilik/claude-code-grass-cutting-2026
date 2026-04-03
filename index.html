@@ -101,6 +101,20 @@ function TypeBadge({ type, small }) {
 
 // ─── Tabulka ─────────────────────────────────────────────────────────────────
 function TableView() {
+  const storageKey = "seceni-hotovo-2026";
+  const [done, setDone] = React.useState(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
+    catch { return {}; }
+  });
+
+  function toggleDone(i) {
+    setDone(prev => {
+      const next = { ...prev, [i]: !prev[i] };
+      localStorage.setItem(storageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
   return (
     <div style={{ overflowX: "auto" }}>
       <table style={{
@@ -110,7 +124,7 @@ function TableView() {
       }}>
         <thead>
           <tr style={{ background: PLP_BLUE }}>
-            {["Datum", "Den", "Typ sečení", "Sekáč / Sekáči"].map(h => (
+            {["Datum", "Den", "Typ sečení", "Sekáč / Sekáči", "Hotovo"].map(h => (
               <th key={h} style={{
                 padding: "14px 18px", textAlign: "left",
                 color: "#fff", fontWeight: 600, fontSize: 14,
@@ -120,10 +134,14 @@ function TableView() {
         </thead>
         <tbody>
           {SCHEDULE.map((entry, i) => {
-            const isKostel = entry.type === "kostel";
-            const bg = i % 2 === 0 ? CARD_BG : "#f7faff";
+            const isDone = !!done[i];
+            const bg = isDone ? "#f0fdf4" : (i % 2 === 0 ? CARD_BG : "#f7faff");
             return (
-              <tr key={i} style={{ background: bg, borderBottom: `1px solid ${BORDER}` }}>
+              <tr key={i} style={{
+                background: bg,
+                borderBottom: `1px solid ${BORDER}`,
+                opacity: isDone ? 0.75 : 1,
+              }}>
                 <td style={{ padding: "13px 18px", fontWeight: 600, color: PLP_BLUE, whiteSpace: "nowrap" }}>
                   {entry.date.getDate()}. {MONTHS_CS[entry.date.getMonth()].toLowerCase()}
                 </td>
@@ -133,8 +151,27 @@ function TableView() {
                 <td style={{ padding: "13px 18px" }}>
                   <TypeBadge type={entry.type} />
                 </td>
-                <td style={{ padding: "13px 18px", fontWeight: 500 }}>
+                <td style={{ padding: "13px 18px", fontWeight: 500,
+                  textDecoration: isDone ? "line-through" : "none",
+                  color: isDone ? MID_GRAY : DARK_GRAY,
+                }}>
                   {entry.people.join(" + ")}
+                </td>
+                <td style={{ padding: "13px 18px" }}>
+                  <button
+                    onClick={() => toggleDone(i)}
+                    title={isDone ? "Označit jako nehotovo" : "Označit jako hotovo"}
+                    style={{
+                      width: 32, height: 32, borderRadius: 8, border: "none",
+                      cursor: "pointer", fontSize: 18, lineHeight: 1,
+                      background: isDone ? GARDEN_BG : "#f1f5f9",
+                      color: isDone ? GARDEN_FG : MID_GRAY,
+                      transition: "all 0.15s",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}
+                  >
+                    {isDone ? "✓" : "○"}
+                  </button>
                 </td>
               </tr>
             );
