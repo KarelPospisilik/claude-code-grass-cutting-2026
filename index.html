@@ -5,9 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rozpis sečení 2026</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyDi489myZTFlmEg5bK3SJTWdEJtgWyXaiI",
+      authDomain: "grass-cutting-2026.firebaseapp.com",
+      databaseURL: "https://grass-cutting-2026-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "grass-cutting-2026",
+      storageBucket: "grass-cutting-2026.firebasestorage.app",
+      messagingSenderId: "962100409749",
+      appId: "1:962100409749:web:81d6f3268de4068346329c"
+    });
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -101,18 +114,18 @@ function TypeBadge({ type, small }) {
 
 // ─── Tabulka ─────────────────────────────────────────────────────────────────
 function TableView() {
-  const storageKey = "seceni-hotovo-2026";
-  const [done, setDone] = React.useState(() => {
-    try { return JSON.parse(localStorage.getItem(storageKey) || "{}"); }
-    catch { return {}; }
-  });
+  const [done, setDone] = React.useState({});
+
+  React.useEffect(() => {
+    const ref = firebase.database().ref("hotovo");
+    ref.on("value", snapshot => {
+      setDone(snapshot.val() || {});
+    });
+    return () => ref.off();
+  }, []);
 
   function toggleDone(i) {
-    setDone(prev => {
-      const next = { ...prev, [i]: !prev[i] };
-      localStorage.setItem(storageKey, JSON.stringify(next));
-      return next;
-    });
+    firebase.database().ref("hotovo/" + i).set(done[i] ? null : true);
   }
 
   return (
