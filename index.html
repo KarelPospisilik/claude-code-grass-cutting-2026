@@ -115,6 +115,7 @@ function TypeBadge({ type, small }) {
 // ─── Tabulka ─────────────────────────────────────────────────────────────────
 function TableView() {
   const [done, setDone] = React.useState({});
+  const [filter, setFilter] = React.useState("");
 
   React.useEffect(() => {
     const ref = firebase.database().ref("hotovo");
@@ -128,8 +129,43 @@ function TableView() {
     firebase.database().ref("hotovo/" + i).set(done[i] ? null : true);
   }
 
+  const allPeople = [...new Set(SCHEDULE.flatMap(e => e.people))].sort((a, b) =>
+    a.split(" ").pop().localeCompare(b.split(" ").pop(), "cs")
+  );
+
+  const filtered = SCHEDULE.map((entry, i) => ({ entry, i }))
+    .filter(({ entry }) => !filter || entry.people.includes(filter));
+
   return (
-    <div style={{ overflowX: "auto" }}>
+    <div>
+      {/* Filtr */}
+      <div style={{ marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+        <label style={{ fontWeight: 600, fontSize: 14, color: DARK_GRAY }}>Filtr dle sekáče:</label>
+        <select
+          value={filter}
+          onChange={e => setFilter(e.target.value)}
+          style={{
+            padding: "8px 12px", borderRadius: 8, border: `1.5px solid ${BORDER}`,
+            fontFamily: "Barlow, sans-serif", fontSize: 14, color: DARK_GRAY,
+            background: CARD_BG, cursor: "pointer", outline: "none",
+          }}
+        >
+          <option value="">— Všichni sekáči —</option>
+          {allPeople.map(p => <option key={p} value={p}>{p}</option>)}
+        </select>
+        {filter && (
+          <button
+            onClick={() => setFilter("")}
+            style={{
+              background: "none", border: "none", color: MID_GRAY,
+              cursor: "pointer", fontSize: 13, fontFamily: "Barlow, sans-serif",
+              textDecoration: "underline", padding: 0,
+            }}
+          >Zrušit filtr</button>
+        )}
+      </div>
+
+      <div style={{ overflowX: "auto" }}>
       <table style={{
         width: "100%", borderCollapse: "collapse",
         background: CARD_BG, borderRadius: 12, overflow: "hidden",
@@ -146,9 +182,9 @@ function TableView() {
           </tr>
         </thead>
         <tbody>
-          {SCHEDULE.map((entry, i) => {
+          {filtered.map(({ entry, i }, rowIdx) => {
             const isDone = !!done[i];
-            const bg = isDone ? "#f0fdf4" : (i % 2 === 0 ? CARD_BG : "#f7faff");
+            const bg = isDone ? "#f0fdf4" : (rowIdx % 2 === 0 ? CARD_BG : "#f7faff");
             return (
               <tr key={i} style={{
                 background: bg,
@@ -168,7 +204,11 @@ function TableView() {
                   textDecoration: isDone ? "line-through" : "none",
                   color: isDone ? MID_GRAY : DARK_GRAY,
                 }}>
-                  {entry.people.join(" + ")}
+                  {entry.people.map((p, pi) => (
+                    <span key={pi} style={{ fontWeight: filter && p === filter ? 700 : 500, color: filter && p === filter ? PLP_BLUE : "inherit" }}>
+                      {pi > 0 ? " + " : ""}{p}
+                    </span>
+                  ))}
                 </td>
                 <td style={{ padding: "13px 18px" }}>
                   <button
@@ -191,6 +231,7 @@ function TableView() {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }
