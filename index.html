@@ -7,6 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -537,9 +538,33 @@ function ZpravyView() {
   );
 }
 
+const ADMIN_EMAIL = "karelpospisilik@gmail.com";
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const [view, setView] = React.useState("table"); // "table" | "calendar" | "zpravy"
+  const [user, setUser] = React.useState(null);
+  const [authLoading, setAuthLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    firebase.auth().onAuthStateChanged(u => {
+      setUser(u);
+      setAuthLoading(false);
+    });
+  }, []);
+
+  function signIn() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({ login_hint: ADMIN_EMAIL });
+    firebase.auth().signInWithPopup(provider);
+  }
+
+  function signOut() {
+    firebase.auth().signOut();
+    if (view === "zpravy") setView("table");
+  }
+
+  const isAdmin = user && user.email === ADMIN_EMAIL;
 
   const tabBtn = (v, label) => (
     <button
@@ -563,13 +588,37 @@ function App() {
     <div style={{ minHeight: "100vh", background: LIGHT_BG }}>
       {/* Header */}
       <header style={{ background: PLP_BLUE, padding: "0 24px" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto", padding: "22px 0" }}>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>
-            Farní zahrada &amp; Kostel
+        <div style={{ maxWidth: 900, margin: "0 auto", padding: "22px 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.7)", marginBottom: 4, letterSpacing: 1, textTransform: "uppercase" }}>
+              Farní zahrada &amp; Kostel
+            </div>
+            <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
+              Rozpis sečení 2026
+            </h1>
           </div>
-          <h1 style={{ color: "#fff", fontSize: 28, fontWeight: 700, lineHeight: 1.2 }}>
-            Rozpis sečení 2026
-          </h1>
+          {!authLoading && (
+            isAdmin ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ color: "rgba(255,255,255,0.85)", fontSize: 13 }}>👤 {user.displayName}</span>
+                <button onClick={signOut} style={{
+                  background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.4)",
+                  color: "#fff", borderRadius: 8, padding: "6px 14px", fontSize: 13,
+                  cursor: "pointer", fontFamily: "Barlow, sans-serif",
+                }}>Odhlásit</button>
+              </div>
+            ) : (
+              <button onClick={signIn} style={{
+                background: "#fff", border: "none", color: PLP_BLUE,
+                borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 700,
+                cursor: "pointer", fontFamily: "Barlow, sans-serif",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style={{ width: 16, height: 16 }} />
+                Přihlásit
+              </button>
+            )
+          )}
         </div>
       </header>
 
@@ -638,7 +687,7 @@ function App() {
         }}>
           {tabBtn("table", "📋 Tabulka")}
           {tabBtn("calendar", "📅 Kalendář")}
-          {tabBtn("zpravy", "📨 Zprávy")}
+          {isAdmin && tabBtn("zpravy", "📨 Zprávy")}
         </div>
 
         {/* Content */}
