@@ -174,7 +174,7 @@ function TableView() {
       }}>
         <thead>
           <tr style={{ background: PLP_BLUE }}>
-            {["Datum", "Den", "Typ sečení", "Sekáč / Sekáči", "Hotovo"].map(h => (
+            {["Datum", "Typ sečení", "Sekáč / Sekáči", "Hotovo"].map(h => (
               <th key={h} style={{
                 padding: "14px 18px", textAlign: "left",
                 color: "#fff", fontWeight: 600, fontSize: 14,
@@ -195,9 +195,7 @@ function TableView() {
                 <td style={{ padding: "13px 18px", fontWeight: 600, color: PLP_BLUE, whiteSpace: "nowrap" }}>
                   {entry.date.getDate()}. {MONTHS_CS[entry.date.getMonth()].toLowerCase()}
                 </td>
-                <td style={{ padding: "13px 18px", color: MID_GRAY, fontSize: 13 }}>
-                  sobota
-                </td>
+
                 <td style={{ padding: "13px 18px" }}>
                   <TypeBadge type={entry.type} />
                 </td>
